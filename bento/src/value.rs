@@ -1,4 +1,5 @@
 use indexmap::IndexMap;
+use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::take_until,
@@ -17,8 +18,17 @@ pub enum Value<'a> {
     Dictionary(IndexMap<&'a [u8], Value<'a>>),
 }
 
-impl<'a> Value<'a> {
-    
+pub trait Bencode {
+    fn bdecode(bytes: &[u8]) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        Self::from_value(decode(bytes).unwrap())
+    }
+
+    fn from_value(value: Value) -> Result<Self>
+    where
+        Self: Sized;
 }
 
 pub fn decode(bytes: &[u8]) -> Result<Value, nom::error::Error<&[u8]>> {
