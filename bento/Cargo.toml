@@ -1,0 +1,21 @@
+[package]
+name = "bento"
+version = "0.1.0"
+authors = ["Federico Morrone <contact@morrone.dev>"]
+edition = "2021"
+
+[dependencies]
+atoi = "0.4.0"
+nom = "7.0.0"
+thiserror = "1.0.30"
+indexmap = { version = "1.7.0", optional = true }
+
+[dev-dependencies]
+anyhow = "1.0.44"
+criterion = "0.3"
+sha-1 = "0.9.8"
+url =  "2.2.2"
+
+[[bench]]
+name = "torrent"
+harness = false
