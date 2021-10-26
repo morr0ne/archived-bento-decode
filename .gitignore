@@ -1,2 +1,7 @@
+# rust stuff
 /target
 Cargo.lock
+
+# temp directories
+/temp
+/tmp
