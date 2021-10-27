@@ -1,12 +1,8 @@
 use atoi::atoi;
-#[cfg(feature = "indexmap")]
-use indexmap::IndexMap;
 use std::{
     collections::HashMap,
     hash::{BuildHasher, Hash},
 };
-#[cfg(feature = "url")]
-use url::Url;
 
 use crate::AsString;
 
@@ -106,7 +102,7 @@ where
 }
 
 #[cfg(feature = "indexmap")]
-impl<K, V, H> FromBencode for IndexMap<K, V, H>
+impl<K, V, H> FromBencode for indexmap::IndexMap<K, V, H>
 where
     K: FromBencode + Hash + Eq,
     V: FromBencode,
@@ -117,7 +113,7 @@ where
         Self: Sized,
     {
         let mut dict = object.try_dictionary()?;
-        let mut result = IndexMap::default();
+        let mut result = Self::default();
 
         while let Some((key, value)) = dict.next_pair()? {
             let key = K::decode(Object::ByteString(key))?;
@@ -131,12 +127,12 @@ where
 }
 
 #[cfg(feature = "url")]
-impl FromBencode for Url {
+impl FromBencode for url::Url {
     fn decode(object: Object) -> Result<Self, DecodingError>
     where
         Self: Sized,
     {
-        Url::parse(
+        Self::parse(
             std::str::from_utf8(object.try_byte_string()?).map_err(|_| DecodingError::Unknown)?,
         )
         .map_err(|_| DecodingError::Unknown) // TODO: map proper error
