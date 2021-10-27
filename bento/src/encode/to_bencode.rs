@@ -109,3 +109,10 @@ where
         });
     }
 }
+
+#[cfg(feature = "url")]
+impl ToBencode for url::Url {
+    fn encode(&self, encoder: &mut Encoder) {
+        encoder.emit_byte_string(self)
+    }
+}
