@@ -8,5 +8,9 @@ edition = "2021"
 quote = "1.0.10"
 syn = "1.0.80"
 
+[dev-dependencies]
+anyhow = "1.0.44"
+bento = { version = "0.1.0", path = "../bento" }
+
 [lib]
 proc-macro = true
