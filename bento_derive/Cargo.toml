@@ -5,7 +5,8 @@ authors = ["Federico Morrone <contact@morrone.dev>"]
 edition = "2021"
 
 [dependencies]
-bento = { version = "0.1.0", path = "../bento"} 
+quote = "1.0.10"
+syn = "1.0.80"
 
 [lib]
 proc-macro = true
