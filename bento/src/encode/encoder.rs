@@ -50,13 +50,13 @@ impl Encoder {
     }
 
     /// Emit a string
-    pub fn emit_byte_string(&mut self, value: &str) {
-        self.emit_token(Token::ByteString(value.as_bytes()))
+    pub fn emit_byte_string<T: AsRef<str>>(&mut self, value: T) {
+        self.emit_token(Token::ByteString(value.as_ref().as_bytes()))
     }
 
     /// Emit a byte array
-    pub fn emit_byte_array(&mut self, value: &[u8]) {
-        self.emit_token(Token::ByteString(value))
+    pub fn emit_byte_array<T: AsRef<[u8]>>(&mut self, value: T) {
+        self.emit_token(Token::ByteString(value.as_ref()))
     }
 
     /// Emit an integer
