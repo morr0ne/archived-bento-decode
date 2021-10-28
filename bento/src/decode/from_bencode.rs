@@ -2,6 +2,7 @@ use atoi::atoi;
 use std::{
     collections::HashMap,
     hash::{BuildHasher, Hash},
+    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
 use crate::AsString;
@@ -77,6 +78,26 @@ impl FromBencode for String {
     }
 }
 
+macro_rules! impl_from_bencode_for_from_str {
+    ($($type:ty)*) => {$(
+        impl FromBencode for $type {
+
+            fn decode(object: Object) -> Result<Self, DecodingError>
+            where
+                Self: Sized,
+            {
+                String::decode(object)?
+                    .parse()
+                    .map_err(|_| DecodingError::Unknown)
+            }
+        }
+    )*}
+}
+
+impl_from_bencode_for_from_str!(Ipv4Addr Ipv6Addr IpAddr SocketAddrV4 SocketAddrV6 SocketAddr );
+#[cfg(feature = "url")]
+impl_from_bencode_for_from_str!(url::Url);
+
 impl<K, V, H> FromBencode for HashMap<K, V, H>
 where
     K: FromBencode + Hash + Eq,
@@ -123,18 +144,5 @@ where
         }
 
         Ok(result)
-    }
-}
-
-#[cfg(feature = "url")]
-impl FromBencode for url::Url {
-    fn decode(object: Object) -> Result<Self, DecodingError>
-    where
-        Self: Sized,
-    {
-        Self::parse(
-            std::str::from_utf8(object.try_byte_string()?).map_err(|_| DecodingError::Unknown)?,
-        )
-        .map_err(|_| DecodingError::Unknown) // TODO: map proper error
     }
 }
