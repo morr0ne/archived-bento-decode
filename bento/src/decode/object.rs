@@ -27,6 +27,10 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         }
     }
 
+    pub const fn is_byte_string(&self) -> bool {
+        matches!(*self, Object::ByteString(_))
+    }
+
     pub fn try_byte_string(self) -> Result<&'de [u8], DecodingError> {
         match self {
             Object::ByteString(byte_string) => Ok(byte_string),
@@ -39,6 +43,10 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
             Object::Integer(integer) => Some(integer),
             _ => None,
         }
+    }
+
+    pub const fn is_integer(&self) -> bool {
+        matches!(*self, Object::Integer(_))
     }
 
     pub fn try_integer(self) -> Result<&'de [u8], DecodingError> {
@@ -55,6 +63,10 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         }
     }
 
+    pub const fn is_list(&self) -> bool {
+        matches!(*self, Object::List(_))
+    }
+
     pub fn try_list(self) -> Result<ListDecoder<'obj, 'de>, DecodingError> {
         match self {
             Object::List(list_decoder) => Ok(list_decoder),
@@ -67,6 +79,10 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
             Object::Dictionary(dictionary_decoder) => Some(dictionary_decoder),
             _ => None,
         }
+    }
+
+    pub const fn is_dictionary(&self) -> bool {
+        matches!(*self, Object::Dictionary(_))
     }
 
     pub fn try_dictionary(self) -> Result<DictionaryDecoder<'obj, 'de>, DecodingError> {
