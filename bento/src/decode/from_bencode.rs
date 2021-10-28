@@ -17,11 +17,7 @@ pub trait FromBencode {
         let mut decoder = Decoder::new(bytes);
         let object = decoder.next_object()?;
 
-        object.map_or(
-            // Err(Error::from(StructureError::UnexpectedEof)),
-            Err(DecodingError::Unknown),
-            Self::decode,
-        )
+        object.map_or(Err(DecodingError::UnexpectedEof), Self::decode)
     }
 
     fn decode(object: Object) -> Result<Self, DecodingError>
