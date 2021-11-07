@@ -1,7 +1,6 @@
-use crate::token::Token;
 use std::fmt::Display;
 
-use super::to_bencode::ToBencode;
+use super::{ToBencode, Token};
 
 pub trait PrintableInteger: Display {}
 

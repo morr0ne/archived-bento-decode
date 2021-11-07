@@ -1,8 +1,6 @@
 use std::collections::{LinkedList, VecDeque};
 
-use crate::AsString;
-
-use super::{Encoder, EncodingError};
+use super::{AsString, Encoder, EncodingError};
 
 pub trait ToBencode {
     fn to_bencode(&self) -> Result<Vec<u8>, EncodingError>
