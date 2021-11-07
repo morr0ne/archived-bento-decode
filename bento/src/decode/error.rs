@@ -1,13 +1,15 @@
 #[derive(Debug, thiserror::Error)]
 pub enum DecodingError {
+    #[error("")]
+    MissingDictionaryValue,
     #[error("Missing field {field}")]
     MissingField { field: String },
     #[error("Unexpected field {field}")]
     UnexpectedField { field: String },
     #[error("Expected object: {expected_object}, found {actual_object}")]
     UnexpectedObject {
-        expected_object: String,
-        actual_object: String,
+        expected_object: &'static str,
+        actual_object: &'static str,
     },
     #[error("Document ended to soon")]
     UnexpectedEof,
@@ -16,25 +18,21 @@ pub enum DecodingError {
 }
 
 impl DecodingError {
-    pub fn missing_field<F: ToString>(field: F) -> Self {
-        Self::MissingField {
-            field: field.to_string(),
-        }
+    pub const fn missing_field(field: String) -> Self {
+        Self::MissingField { field }
     }
 
-    pub fn unexpected_field<F: ToString>(field: F) -> Self {
-        Self::UnexpectedField {
-            field: field.to_string(),
-        }
+    pub const fn unexpected_field(field: String) -> Self {
+        Self::UnexpectedField { field }
     }
 
-    pub fn unexpected_object<E: ToString, A: ToString>(
-        expected_object: E,
-        actual_object: A,
+    pub const fn unexpected_object(
+        expected_object: &'static str,
+        actual_object: &'static str,
     ) -> Self {
         Self::UnexpectedObject {
-            expected_object: expected_object.to_string(),
-            actual_object: actual_object.to_string(),
+            expected_object,
+            actual_object,
         }
     }
 }

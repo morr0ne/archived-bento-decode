@@ -2,24 +2,18 @@ use nom::{
     branch::alt,
     bytes::complete::take_until,
     character::complete::{char, digit1},
-    combinator::{map, map_parser, opt},
+    combinator::{map, map_parser},
     multi::length_data,
     sequence::{delimited, terminated},
     Finish, IResult,
 };
 
-use crate::token::Token;
-
-use super::{error::DecodingError, object::Object};
-
-
+use super::{DecodingError, Object, Token};
 
 pub struct Decoder<'a> {
     bytes: &'a [u8],
 }
-
 pub struct ListDecoder<'obj, 'de: 'obj>(&'obj mut Decoder<'de>);
-
 pub struct DictionaryDecoder<'obj, 'de: 'obj>(&'obj mut Decoder<'de>);
 
 impl<'de> Decoder<'de> {
@@ -45,18 +39,19 @@ impl<'de> Decoder<'de> {
     }
 
     fn next_token(&mut self) -> Result<Option<Token<'de>>, DecodingError> {
-        let (bytes, token) = opt(alt((
+        alt((
             Self::decode_byte_string,
             Self::decode_integer,
             map(char('l'), |_| Token::ListStart),
             map(char('d'), |_| Token::DictionaryStart),
             map(char('e'), |_| Token::End),
-        )))(self.bytes)
+        ))(self.bytes)
         .finish()
-        .map_err(|_| DecodingError::Unknown)?; // TODO: Map to an actual error
-
-        self.bytes = bytes;
-        Ok(token)
+        .map(|(bytes, token)| {
+            self.bytes = bytes;
+            Some(token)
+        })
+        .map_err(|_error| DecodingError::Unknown) // TODO: Map to an actual error
     }
 
     pub fn next_object<'obj>(&'obj mut self) -> Result<Option<Object<'obj, 'de>>, DecodingError> {
@@ -78,12 +73,7 @@ impl<'obj, 'de: 'obj> ListDecoder<'obj, 'de> {
     pub fn next_object<'item>(
         &'item mut self,
     ) -> Result<Option<Object<'item, 'de>>, DecodingError> {
-        let item = self.0.next_object()?;
-        if item.is_none() {
-            return Ok(None);
-        }
-
-        Ok(item)
+        self.0.next_object()
     }
 }
 
@@ -95,11 +85,17 @@ impl<'obj, 'de: 'obj> DictionaryDecoder<'obj, 'de> {
     pub fn next_pair<'item>(
         &'item mut self,
     ) -> Result<Option<(&'de [u8], Object<'item, 'de>)>, DecodingError> {
-        Ok(if let Some(Object::ByteString(k)) = self.0.next_object()? {
-            let v = self.0.next_object()?.unwrap();
-            Some((k, v))
+        if let Some(Object::ByteString(key)) = self.0.next_object()? {
+            if let Some(value) = self.0.next_object()? {
+                Ok(Some((key, value)))
+            } else {
+                Err(DecodingError::MissingDictionaryValue)
+            }
         } else {
-            None
-        })
+            Ok(None)
+        }
     }
 }
+
+#[cfg(test)]
+mod tests {}
