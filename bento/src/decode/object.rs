@@ -31,7 +31,7 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         matches!(*self, Object::ByteString(_))
     }
 
-    pub fn try_byte_string(self) -> Result<&'de [u8], DecodingError> {
+    pub const fn try_byte_string(self) -> Result<&'de [u8], DecodingError> {
         match self {
             Object::ByteString(byte_string) => Ok(byte_string),
             _ => Err(DecodingError::unexpected_object("ByteString", self.name())),
@@ -49,7 +49,7 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         matches!(*self, Object::Integer(_))
     }
 
-    pub fn try_integer(self) -> Result<&'de [u8], DecodingError> {
+    pub const fn try_integer(self) -> Result<&'de [u8], DecodingError> {
         match self {
             Object::Integer(integer) => Ok(integer),
             _ => Err(DecodingError::unexpected_object("Integer", self.name())),
@@ -67,7 +67,7 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         matches!(*self, Object::List(_))
     }
 
-    pub fn try_list(self) -> Result<ListDecoder<'obj, 'de>, DecodingError> {
+    pub const fn try_list(self) -> Result<ListDecoder<'obj, 'de>, DecodingError> {
         match self {
             Object::List(list_decoder) => Ok(list_decoder),
             _ => Err(DecodingError::unexpected_object("List", self.name())),
@@ -85,7 +85,7 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
         matches!(*self, Object::Dictionary(_))
     }
 
-    pub fn try_dictionary(self) -> Result<DictionaryDecoder<'obj, 'de>, DecodingError> {
+    pub const fn try_dictionary(self) -> Result<DictionaryDecoder<'obj, 'de>, DecodingError> {
         match self {
             Object::Dictionary(dictionary_decoder) => Ok(dictionary_decoder),
             _ => Err(DecodingError::unexpected_object("Dictionary", self.name())),
