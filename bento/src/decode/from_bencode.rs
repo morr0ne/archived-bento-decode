@@ -5,9 +5,7 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
-use crate::AsString;
-
-use super::{decoder::Decoder, error::DecodingError, object::Object};
+use super::{AsString, Decoder, DecodingError, Object};
 
 pub trait FromBencode {
     fn from_bencode(bytes: &[u8]) -> Result<Self, DecodingError>
@@ -118,7 +116,6 @@ where
     }
 }
 
-#[cfg(feature = "indexmap")]
 impl<K, V, H> FromBencode for indexmap::IndexMap<K, V, H>
 where
     K: FromBencode + Hash + Eq,
