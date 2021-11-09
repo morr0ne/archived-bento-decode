@@ -84,6 +84,10 @@ impl<'de> Decoder<'de> {
 }
 
 impl<'obj, 'de: 'obj> ListDecoder<'obj, 'de> {
+    pub const fn as_bytes(self) -> &'de [u8] {
+        self.0.bytes
+    }
+
     pub fn new(decoder: &'obj mut Decoder<'de>) -> Self {
         Self(decoder)
     }
@@ -96,6 +100,10 @@ impl<'obj, 'de: 'obj> ListDecoder<'obj, 'de> {
 }
 
 impl<'obj, 'de: 'obj> DictionaryDecoder<'obj, 'de> {
+    pub const fn as_bytes(self) -> &'de [u8] {
+        self.0.bytes
+    }
+
     pub fn new(decoder: &'obj mut Decoder<'de>) -> Self {
         Self(decoder)
     }
