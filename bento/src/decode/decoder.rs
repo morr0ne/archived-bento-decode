@@ -1,10 +1,10 @@
 use nom::{
     branch::alt,
-    bytes::complete::take_until,
+    bytes::complete::{tag, take_until},
     character::complete::{char, digit1},
-    combinator::{map, map_parser},
+    combinator::{map, map_parser, map_res, opt, peek, rest},
     multi::length_data,
-    sequence::{delimited, terminated},
+    sequence::{delimited, terminated, tuple},
     Finish, IResult,
 };
 
@@ -31,10 +31,28 @@ impl<'de> Decoder<'de> {
         )(bytes)
     }
 
+    // TODO: this function def needs some optimizationI
+    fn decode_integer_with_sign(bytes: &[u8]) -> IResult<&[u8], Token> {
+        map_res(
+            tuple((peek(tuple((opt(tag(b"-")), digit1))), rest)),
+            |((sign, _integer), complete)| {
+                if let Some(sign) = sign {
+                    if sign != b"-" && complete == b"-0" {
+                        Err(DecodingError::Unknown)
+                    } else {
+                        Ok(Token::Integer(complete))
+                    }
+                } else {
+                    Ok(Token::Integer(complete))
+                }
+            },
+        )(bytes)
+    }
+
     fn decode_integer(bytes: &[u8]) -> IResult<&[u8], Token> {
-        map(
-            map_parser(delimited(char('i'), take_until("e"), char('e')), digit1),
-            Token::Integer,
+        map_parser(
+            delimited(char('i'), take_until("e"), char('e')),
+            Self::decode_integer_with_sign,
         )(bytes)
     }
 
@@ -98,4 +116,59 @@ impl<'obj, 'de: 'obj> DictionaryDecoder<'obj, 'de> {
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use std::num::NonZeroUsize;
+
+    use super::*;
+    use nom::{Err as NomErr, Needed};
+
+    #[test]
+    fn decode_integer() {
+        assert_eq!(
+            Ok(([].as_ref(), Token::Integer(b"1"))),
+            Decoder::decode_integer(b"i1e")
+        );
+    }
+
+    #[test]
+    fn decode_negative_integer() {
+        assert_eq!(
+            Ok(([].as_ref(), Token::Integer(b"-1"))),
+            Decoder::decode_integer(b"i-1e")
+        );
+    }
+
+    #[test]
+    fn decode_negative_zero() {
+        assert_eq!(
+            Ok(([].as_ref(), Token::Integer(b"-0"))),
+            Decoder::decode_integer(b"i-0e")
+        );
+    }
+
+    #[test]
+    fn decode_big_integer() {
+        assert_eq!(
+            Ok(([].as_ref(), Token::Integer(b"02398421923842"))),
+            Decoder::decode_integer(b"i02398421923842e")
+        );
+    }
+
+    #[test]
+    fn decode_byte_string() {
+        assert_eq!(
+            Ok(([].as_ref(), Token::ByteString(b"hello"))),
+            Decoder::decode_byte_string(b"5:hello")
+        );
+    }
+
+    #[test]
+    fn decode_byte_string_invalid_len() {
+        assert_eq!(
+            Err(NomErr::Incomplete(Needed::Size(unsafe {
+                NonZeroUsize::new_unchecked(1)
+            }))), // Hello is of len 5, that means we get an error that we are missing 1 more byte
+            Decoder::decode_byte_string(b"6:hello")
+        );
+    }
+}
