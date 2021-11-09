@@ -3,7 +3,7 @@ pub enum DecodingError {
     #[error("")]
     MissingDictionaryValue,
     #[error("Missing field {field}")]
-    MissingField { field: String },
+    MissingField { field: &'static str },
     #[error("Unexpected field {field}")]
     UnexpectedField { field: String },
     #[error("Expected object: {expected_object}, found {actual_object}")]
@@ -18,7 +18,7 @@ pub enum DecodingError {
 }
 
 impl DecodingError {
-    pub const fn missing_field(field: String) -> Self {
+    pub const fn missing_field(field: &'static str) -> Self {
         Self::MissingField { field }
     }
 
