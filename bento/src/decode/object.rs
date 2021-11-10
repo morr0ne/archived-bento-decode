@@ -11,6 +11,15 @@ pub enum Object<'obj, 'de: 'obj> {
 }
 
 impl<'obj, 'de: 'obj> Object<'obj, 'de> {
+    pub const fn as_bytes(self) -> &'de [u8] {
+        match self {
+            Object::ByteString(byte_string) => byte_string,
+            Object::Integer(integer) => integer,
+            Object::List(list_decoder) => list_decoder.as_bytes(),
+            Object::Dictionary(dictionary_decoder) => dictionary_decoder.as_bytes(),
+        }
+    }
+
     pub const fn name(&self) -> &'static str {
         match *self {
             Object::ByteString(_) => "ByteString",
