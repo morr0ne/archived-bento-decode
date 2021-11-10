@@ -1,6 +1,8 @@
 mod decode;
 mod encode;
 
+#[cfg(feature = "derive")]
+pub use bento_derive::{FromBencode, ToBencode};
 pub use decode::{Decoder, DecodingError, DictionaryDecoder, FromBencode, ListDecoder, Object};
 pub use encode::{DictionaryEncoder, Encoder, ToBencode};
 
