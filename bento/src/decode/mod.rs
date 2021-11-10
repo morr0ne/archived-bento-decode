@@ -2,10 +2,8 @@ mod decoder;
 mod error;
 mod from_bencode;
 mod object;
-mod value;
 
-pub(crate) use crate::{AsString, Token};
-
+pub(crate) use crate::{AsString, Token, Value};
 
 pub use decoder::{Decoder, DictionaryDecoder, ListDecoder};
 pub use error::DecodingError;

@@ -5,7 +5,7 @@ use std::{
     net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6},
 };
 
-use super::{AsString, Decoder, DecodingError, Object};
+use super::{AsString, Decoder, DecodingError, Object, Value};
 
 pub trait FromBencode {
     fn from_bencode(bytes: &[u8]) -> Result<Self, DecodingError>
@@ -21,6 +21,16 @@ pub trait FromBencode {
     fn decode(object: Object) -> Result<Self, DecodingError>
     where
         Self: Sized;
+}
+
+impl<'obj, 'de> FromBencode for Value<'de> {
+    fn decode(object: Object) -> Result<Self, DecodingError>
+    where
+        Self: Sized,
+    {
+        // Decoder::decode(object.as_bytes())
+        todo!()
+    }
 }
 
 impl FromBencode for AsString<Vec<u8>> {

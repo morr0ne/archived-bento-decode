@@ -17,3 +17,11 @@ pub enum Token<'a> {
     DictionaryStart,
     End,
 }
+
+#[derive(Debug)]
+pub enum Value<'a> {
+    ByteString(&'a [u8]),
+    Integer(&'a [u8]),
+    List(Vec<Value<'a>>),
+    Dictionary(indexmap::IndexMap<&'a [u8], Value<'a>>),
+}
