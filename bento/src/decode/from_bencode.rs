@@ -77,8 +77,7 @@ impl FromBencode for String {
     where
         Self: Sized,
     {
-        // TODO: map proper error
-        String::from_utf8(object.try_byte_string()?.to_vec()).map_err(|_| DecodingError::Unknown)
+        Ok(String::from_utf8(object.try_byte_string()?.to_vec())?)
     }
 }
 

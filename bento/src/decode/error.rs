@@ -1,3 +1,5 @@
+use std::string::FromUtf8Error;
+
 #[derive(Debug, thiserror::Error)]
 pub enum DecodingError {
     #[error("")]
@@ -13,6 +15,8 @@ pub enum DecodingError {
     },
     #[error("Document ended to soon")]
     UnexpectedEof,
+    #[error("Invalid String")]
+    InvalidString(#[from] FromUtf8Error),
     #[error("Unknown error")]
     Unknown,
 }
