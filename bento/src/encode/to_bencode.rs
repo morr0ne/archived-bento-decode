@@ -1,9 +1,9 @@
 use std::collections::{LinkedList, VecDeque};
 
-use super::{AsString, Encoder, EncodingError};
+use super::{AsString, Encoder};
 
 pub trait ToBencode {
-    fn to_bencode(&self) -> Result<Vec<u8>, EncodingError>
+    fn to_bencode(&self) -> Vec<u8>
     where
         Self: Sized,
     {
@@ -11,7 +11,7 @@ pub trait ToBencode {
 
         self.encode(&mut encoder);
 
-        Ok(encoder.bytes)
+        encoder.bytes
     }
 
     fn encode(&self, encoder: &mut Encoder);
