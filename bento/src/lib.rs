@@ -7,7 +7,7 @@ pub use decode::{Decoder, DecodingError, DictionaryDecoder, FromBencode, ListDec
 pub use encode::{DictionaryEncoder, Encoder, ToBencode};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct AsString(Vec<u8>);
+pub struct AsString(pub Vec<u8>);
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Token<'a> {
