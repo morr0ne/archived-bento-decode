@@ -7,15 +7,15 @@ use std::{
 
 use super::{AsString, Decoder, DecodingError, Object, Value};
 
-pub trait FromBencode<T: FromBencode = Self> {
-    fn from_bencode(bytes: &[u8]) -> Result<T, DecodingError> {
+pub trait FromBencode<V = Self> {
+    fn from_bencode(bytes: &[u8]) -> Result<V, DecodingError> {
         let mut decoder = Decoder::new(bytes);
         let object = decoder.next_object()?;
 
-        object.map_or(Err(DecodingError::UnexpectedEof), T::decode)
+        object.map_or(Err(DecodingError::UnexpectedEof), Self::decode)
     }
 
-    fn decode(object: Object) -> Result<T, DecodingError>;
+    fn decode(object: Object) -> Result<V, DecodingError>;
 }
 
 impl<'obj, 'de> FromBencode for Value<'de> {
