@@ -28,7 +28,7 @@ impl<'obj, 'de> FromBencode for Value<'de> {
     }
 }
 
-impl FromBencode<Vec<u8>> for AsString<Vec<u8>> {
+impl FromBencode<Vec<u8>> for AsString {
     fn decode(object: Object) -> Result<Vec<u8>, DecodingError> {
         object.try_byte_string().map(Vec::from)
     }
