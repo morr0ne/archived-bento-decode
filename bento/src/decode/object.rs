@@ -1,3 +1,5 @@
+use crate::FromBencode;
+
 use super::{
     decoder::{DictionaryDecoder, ListDecoder},
     DecodingError,
@@ -108,5 +110,9 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
             Object::List(mut list_decoder) => list_decoder.skip(),
             Object::Dictionary(mut dictionary_decoder) => dictionary_decoder.skip(),
         }
+    }
+
+    pub fn decode<T: FromBencode>(self) -> Result<T, DecodingError> {
+        T::decode(self)
     }
 }

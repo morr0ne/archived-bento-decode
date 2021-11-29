@@ -64,7 +64,7 @@ impl<T: FromBencode> FromBencode for Vec<T> {
         let mut results = Vec::new();
 
         while let Some(object) = list.next_object()? {
-            let item = T::decode(object)?;
+            let item = object.decode()?;
             results.push(item);
         }
 
@@ -89,7 +89,7 @@ macro_rules! impl_from_bencode_for_from_str {
             where
                 Self: Sized,
             {
-                String::decode(object)?
+                object.decode::<String>()?
                     .parse()
                     .map_err(|_| DecodingError::Unknown)
             }
@@ -115,8 +115,8 @@ where
         let mut result = HashMap::default();
 
         while let Some((key, value)) = dict.next_pair()? {
-            let key = K::decode(Object::ByteString(key))?;
-            let value = V::decode(value)?;
+            let key = Object::ByteString(key).decode()?;
+            let value = value.decode()?;
 
             result.insert(key, value);
         }
@@ -139,12 +139,21 @@ where
         let mut result = Self::default();
 
         while let Some((key, value)) = dict.next_pair()? {
-            let key = K::decode(Object::ByteString(key))?;
-            let value = V::decode(value)?;
+            let key = Object::ByteString(key).decode()?;
+            let value = value.decode()?;
 
             result.insert(key, value);
         }
 
         Ok(result)
+    }
+}
+
+impl<T: FromBencode> FromBencode for Option<T> {
+    fn decode(object: Object) -> Result<Self, DecodingError>
+    where
+        Self: Sized,
+    {
+        object.decode().map(Option::Some)
     }
 }
