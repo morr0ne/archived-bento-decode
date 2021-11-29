@@ -68,9 +68,12 @@ macro_rules! impl_encodable_iterable {
 
 impl_encodable_iterable!(Vec VecDeque LinkedList);
 
-impl ToBencode for AsString {
+impl<I> ToBencode for AsString<I>
+where
+    I: AsRef<[u8]>,
+{
     fn encode(&self, encoder: &mut Encoder) {
-        encoder.emit_byte_array(&self.0);
+        encoder.emit_byte_array(self.0.as_ref());
     }
 }
 
