@@ -155,6 +155,14 @@ impl<'obj, 'de: 'obj> ListDecoder<'obj, 'de> {
     ) -> Result<Option<Object<'item, 'de>>, DecodingError> {
         self.0.next_object()
     }
+
+    pub fn skip(&mut self) -> Result<(), DecodingError> {
+        loop {
+            if self.next_object()?.is_none() {
+                break Ok(());
+            }
+        }
+    }
 }
 
 impl<'obj, 'de: 'obj> DictionaryDecoder<'obj, 'de> {
@@ -177,6 +185,14 @@ impl<'obj, 'de: 'obj> DictionaryDecoder<'obj, 'de> {
             }
         } else {
             Ok(None)
+        }
+    }
+
+    pub fn skip(&mut self) -> Result<(), DecodingError> {
+        loop {
+            if self.next_pair()?.is_none() {
+                break Ok(());
+            }
         }
     }
 }

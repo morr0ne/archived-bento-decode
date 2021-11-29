@@ -100,4 +100,13 @@ impl<'obj, 'de: 'obj> Object<'obj, 'de> {
             _ => Err(DecodingError::unexpected_object("Dictionary", self.name())),
         }
     }
+
+    pub fn skip(self) -> Result<(), DecodingError> {
+        match self {
+            Object::ByteString(_) => Ok(()),
+            Object::Integer(_) => Ok(()),
+            Object::List(mut list_decoder) => list_decoder.skip(),
+            Object::Dictionary(mut dictionary_decoder) => dictionary_decoder.skip(),
+        }
+    }
 }
